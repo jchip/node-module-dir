@@ -1,46 +1,95 @@
 "use strict";
 
 const { findNodeModuleDir } = require("..");
-const assert = require("assert");
+const Tap = require("tap");
 
-function testFyn(skipSimple = false) {
-  const x = findNodeModuleDir("fyn");
-  assert(x);
+function testWithTap(skipSimple, test) {
+  const x = findNodeModuleDir("tap", { skipSimple });
+  test.ok(x);
   const pkg = require(`${x}/package.json`);
-  assert(pkg.name === "fyn");
+  test.equal(pkg.name, "tap");
 }
 
-testFyn();
-testFyn(true);
+Tap.test("skip simple false", test => {
+  testWithTap(false, test);
+  test.end();
+});
 
-try {
-  findNodeModuleDir("blah");
-} catch (err) {
-  assert(err.code === "MODULE_NOT_FOUND");
-}
+Tap.test("skip simple true", test => {
+  testWithTap(true, test);
+  test.end();
+});
 
-function testWeird() {
+Tap.test("simple throws module not found error", test => {
+  try {
+    findNodeModuleDir("blah");
+  } catch (err) {
+    test.equal(err.code, "MODULE_NOT_FOUND");
+  }
+  test.end();
+});
+
+Tap.test("search stops at node_modules", test => {
   const x = findNodeModuleDir("blah", {
     resolve: () => `${process.cwd()}/node_modules/blah/foo/index.js`,
     skipSimple: true
   });
-  assert(x === null);
-}
+  test.equal(x, null);
+  test.end();
+});
 
-testWeird();
-
-function testWeird2() {
+Tap.test("simple not throw not found", test => {
   const x = findNodeModuleDir("blah", {
     resolve: () => require.resolve("blah"),
     skipSimple: true,
     throwNotFound: false
   });
-  assert(x === null);
-}
+  test.equal(x, null);
+  test.end();
+});
 
-testWeird2();
+Tap.test("simple throw errors other than not found", test => {
+  let error;
+  try {
+    findNodeModuleDir("blah", {
+      resolve: () => {
+        throw new Error("test");
+      }
+    });
+  } catch (err) {
+    error = err;
+  }
+  test.ok(error);
+  test.end();
+});
 
-const x2 = findNodeModuleDir("blah", { throwNotFound: false });
-assert(x2 === null);
+Tap.test("search throw not found error", test => {
+  let error;
+  try {
+    findNodeModuleDir("blah", {
+      resolve: () => {
+        require.resolve("blah");
+      },
+      skipSimple: true
+    });
+  } catch (err) {
+    error = err;
+  }
+  test.ok(error);
+  test.end();
+});
 
-console.log("test OK");
+Tap.test("simple not throw not found error", test => {
+  const x2 = findNodeModuleDir("blah", { throwNotFound: false });
+  Tap.equal(x2, null);
+  test.end();
+});
+
+Tap.test("search stops after 10 levels", test => {
+  const x2 = findNodeModuleDir("blah", {
+    skipSimple: true,
+    resolve: () => "/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/t/u/v/w/x"
+  });
+  test.equal(x2, null);
+  test.end();
+});

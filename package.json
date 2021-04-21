@@ -4,7 +4,7 @@
   "description": "Find the top dir of a package in node_modules",
   "main": "index.js",
   "scripts": {
-    "test": "node test"
+    "test": "tap test"
   },
   "files": [
     "index.js"
@@ -21,6 +21,20 @@
   },
   "license": "Apache-2.0",
   "devDependencies": {
-    "fyn": "*"
+    "tap": "^15.0.4"
+  },
+  "nyc": {
+    "all": true,
+    "reporter": [
+      "lcov",
+      "text",
+      "text-summary"
+    ],
+    "check-coverage": true,
+    "statements": 100,
+    "branches": 100,
+    "functions": 100,
+    "lines": 100,
+    "cache": false
   }
 }
