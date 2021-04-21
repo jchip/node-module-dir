@@ -43,13 +43,11 @@ function findNodeModuleDir(
   try {
     prevDir = Path.dirname(resolve(name));
   } catch (err) {
-    if (err.code === "MODULE_NOT_FOUND") {
-      if (throwNotFound) {
-        throw err;
-      } else {
-        return null;
-      }
+    if (err.code === "MODULE_NOT_FOUND" && !throwNotFound) {
+      return null;
     }
+    // can't continue, so rethrow the error
+    throw err;
   }
 
   let dir = prevDir;
