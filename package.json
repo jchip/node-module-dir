@@ -1,0 +1,26 @@
+{
+  "name": "node-module-dir",
+  "version": "0.0.0",
+  "description": "Find the top dir of a package in node_modules",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test"
+  },
+  "files": [
+    "index.js"
+  ],
+  "keywords": [
+    "node",
+    "module",
+    "dir"
+  ],
+  "author": "Joel Chen",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jchip/node-module-dir.git"
+  },
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "fyn": "*"
+  }
+}
