@@ -19,6 +19,27 @@ try {
   assert(err.code === "MODULE_NOT_FOUND");
 }
 
+function testWeird() {
+  const x = findNodeModuleDir("blah", {
+    resolve: () => `${process.cwd()}/node_modules/blah/foo/index.js`,
+    skipSimple: true
+  });
+  assert(x === null);
+}
+
+testWeird();
+
+function testWeird2() {
+  const x = findNodeModuleDir("blah", {
+    resolve: () => require.resolve("blah"),
+    skipSimple: true,
+    throwNotFound: false
+  });
+  assert(x === null);
+}
+
+testWeird2();
+
 const x2 = findNodeModuleDir("blah", { throwNotFound: false });
 assert(x2 === null);
 

@@ -3,6 +3,8 @@
 const Path = require("path");
 const Fs = require("fs");
 
+const xrequire = eval("require"); // avoid bundler like webpack processing require
+
 /**
  * Find the top dir of a package in `node_modules` by looking for the first dir
  * that contains `package.json` file.  The search stops when it reaches the dir
@@ -19,7 +21,7 @@ const Fs = require("fs");
  */
 function findNodeModuleDir(
   name,
-  { resolve = require.resolve, throwNotFound = true, skipSimple = false } = {}
+  { resolve = xrequire.resolve, throwNotFound = true, skipSimple = false } = {}
 ) {
   if (!skipSimple) {
     try {
@@ -36,7 +38,20 @@ function findNodeModuleDir(
     }
   }
 
-  let prevDir = Path.dirname(resolve(name));
+  let prevDir;
+
+  try {
+    prevDir = Path.dirname(resolve(name));
+  } catch (err) {
+    if (err.code === "MODULE_NOT_FOUND") {
+      if (throwNotFound) {
+        throw err;
+      } else {
+        return null;
+      }
+    }
+  }
+
   let dir = prevDir;
   let n = 0;
 
